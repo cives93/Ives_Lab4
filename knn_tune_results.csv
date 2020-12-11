@@ -1,0 +1,6 @@
+"","neighbors","dist_power",".metric",".estimator","mean","n","std_err",".config"
+"1",20,1.02646825858392,"roc_auc","hand_till",0.608603882433475,10,0.00832232987119752,"Preprocessor1_Model02"
+"2",20,1.23466959991492,"roc_auc","hand_till",0.607765503319169,10,0.00864139645126769,"Preprocessor1_Model09"
+"3",20,1.48511369060725,"roc_auc","hand_till",0.607384267646599,10,0.00857103648370353,"Preprocessor1_Model15"
+"4",20,1.61571746366099,"roc_auc","hand_till",0.605834475042936,10,0.00876577385508914,"Preprocessor1_Model18"
+"5",18,1.70107594807632,"roc_auc","hand_till",0.603251348457786,10,0.00882714415932815,"Preprocessor1_Model20"

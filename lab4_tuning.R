@@ -1,0 +1,46 @@
+library(tidyverse)
+library(tidymodels)
+
+
+full_train <- read_csv("data/train.csv") %>% 
+  sample_frac(.01)
+
+splt <- initial_split(full_train)
+train <- training(splt)
+train_cv <- vfold_cv(train)
+
+# basic recipe
+rec <- recipe(classification ~ enrl_grd + lat + lon + econ_dsvntg, data = train)  %>%
+  step_mutate(enrl_grd = as.factor(enrl_grd),
+              classification = as.factor(classification)) %>% 
+  step_unknown(enrl_grd, econ_dsvntg)  %>% 
+  step_medianimpute(lat, lon) %>% 
+  step_normalize(lat, lon) %>% 
+  step_dummy(enrl_grd, econ_dsvntg)
+
+# lknn model
+knn1_mod <- nearest_neighbor() %>% 
+  set_engine("kknn") %>% 
+  set_mode("classification") %>% 
+  set_args(neighbors = tune(),
+           dist_power = tune())
+
+knn_params <- parameters(neighbors(range = c(1, 20)), 
+                         dist_power())
+
+grid <- grid_max_entropy(knn_params, size = 25)
+
+# ggplot(grid, aes(x = neighbors, y = dist_power)) +
+#   geom_point()
+doParallel::registerDoParallel()
+knn_tune <- tune::tune_grid(knn1_mod,
+                             preprocessor = rec, resamples = train_cv,
+                             grid = grid,
+                             control = tune::control_resamples(save_pred = TRUE))
+
+knn_tune_results <- show_best(knn_tune)
+
+write.csv(knn_tune_results, "knn_tune_results.csv")
+# fit1 <- fit_resamples(knn1_mod, rec, train_cv)
+
+saveRDS(knn_tune, "tune_fit_01.Rds")
